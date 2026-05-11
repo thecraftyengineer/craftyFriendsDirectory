@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Crafty Friends Directory</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--p:#4B0082;--pl:#f3e8ff;--pm:#9d6bbf;--pb:#7b2fbe;--pd:#2d0050;}
+html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+html{overflow-y:scroll;}
+body{
+  background-color:#faf8ff;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Ccircle cx='45' cy='60' r='28' fill='rgba(255,107,157,0.18)'/%3E%3Ccircle cx='190' cy='35' r='36' fill='rgba(255,179,71,0.15)'/%3E%3Ccircle cx='360' cy='80' r='22' fill='rgba(79,195,247,0.18)'/%3E%3Ccircle cx='80' cy='180' r='32' fill='rgba(129,199,132,0.16)'/%3E%3Ccircle cx='280' cy='150' r='40' fill='rgba(75,0,130,0.10)'/%3E%3Ccircle cx='420' cy='210' r='24' fill='rgba(255,107,157,0.14)'/%3E%3Ccircle cx='30' cy='300' r='34' fill='rgba(255,179,71,0.16)'/%3E%3Ccircle cx='160' cy='270' r='20' fill='rgba(129,199,132,0.18)'/%3E%3Ccircle cx='340' cy='320' r='38' fill='rgba(79,195,247,0.14)'/%3E%3Ccircle cx='70' cy='400' r='28' fill='rgba(75,0,130,0.12)'/%3E%3Ccircle cx='230' cy='380' r='24' fill='rgba(255,107,157,0.15)'/%3E%3Ccircle cx='400' cy='410' r='32' fill='rgba(255,179,71,0.14)'/%3E%3Ccircle cx='130' cy='100' r='18' fill='rgba(79,195,247,0.20)'/%3E%3Ccircle cx='310' cy='240' r='26' fill='rgba(255,107,157,0.13)'/%3E%3Ccircle cx='460' cy='140' r='20' fill='rgba(129,199,132,0.17)'/%3E%3Ccircle cx='55' cy='240' r='22' fill='rgba(255,179,71,0.13)'/%3E%3Ccircle cx='250' cy='90' r='30' fill='rgba(75,0,130,0.09)'/%3E%3Ccircle cx='140' cy='340' r='36' fill='rgba(255,107,157,0.12)'/%3E%3Ccircle cx='440' cy='340' r='20' fill='rgba(79,195,247,0.16)'/%3E%3Ccircle cx='380' cy='470' r='28' fill='rgba(129,199,132,0.15)'/%3E%3Ccircle cx='100' cy='460' r='24' fill='rgba(255,179,71,0.17)'/%3E%3Ccircle cx='270' cy='450' r='18' fill='rgba(75,0,130,0.11)'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:500px 500px;
+  padding-bottom:2rem;
+}
+#wrap{max-width:480px;margin:0 auto;padding:0.5rem;}
+
+/* ── HEADER ── */
+.header{background:#4B0082;border-radius:16px;padding:0.5rem 0.75rem;margin-bottom:0.5rem;}
+.header-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.header-title{font-size:13px;font-weight:500;color:white;line-height:1.3;margin-bottom:3px;}
+.header-accounts{display:flex;flex-wrap:wrap;gap:4px 12px;}
+.header-acct{font-size:11px;color:rgba(255,255,255,0.7);}
+.header-acct a{color:#FFB347;text-decoration:none;font-weight:500;}
+.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-top:2px;}
+.nav-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:15px;color:white;display:flex;align-items:center;justify-content:center;line-height:1;}
+.nav-btn:active{background:rgba(255,255,255,0.3);}
+
+/* ── SUMMARY ── */
+.summary-bar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.5rem;align-items:center;}
+.chip{flex:1;text-align:center;padding:5px 4px;border-radius:12px;font-size:10px;font-weight:500;}
+.chip:nth-child(1){background:rgba(243,232,255,0.93);color:#4B0082;}
+.chip:nth-child(2){background:rgba(255,240,245,0.93);color:#c2185b;}
+.chip span{display:block;font-size:16px;font-weight:500;margin-bottom:1px;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:0.5rem;}
+.tab{flex:1;padding:8px 2px;border-radius:10px;border:1.5px solid #e0d0f0;background:rgba(255,255,255,0.88);font-size:10px;cursor:pointer;color:#9d6bbf;text-align:center;font-weight:500;-webkit-tap-highlight-color:transparent;user-select:none;}
+.tab.active{background:#4B0082;color:white;border-color:#4B0082;}
+
+/* ── SEARCH INPUT ── */
+.search-wrap{position:relative;margin-bottom:0.75rem;}
+.search-input{width:100%;padding:10px 36px 10px 36px;border-radius:12px;border:1.5px solid #e0d0f0;font-size:14px;background:rgba(255,255,255,0.95);color:#333;outline:none;font-family:inherit;}
+.search-input:focus{border-color:#4B0082;}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#9d6bbf;pointer-events:none;}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:16px;color:#9d6bbf;cursor:pointer;padding:2px 5px;display:none;line-height:1;}
+
+/* ── A-Z BAR ── */
+.az-bar{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:0.75rem;}
+.az-btn{min-width:26px;height:26px;border-radius:6px;border:1.5px solid #e0d0f0;background:rgba(255,255,255,0.88);font-size:11px;cursor:pointer;color:#9d6bbf;font-weight:500;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.az-btn.active{background:#4B0082;color:white;border-color:#4B0082;}
+.az-btn.inactive{opacity:0.3;cursor:default;pointer-events:none;}
+.az-btn.all-btn{min-width:34px;}
+
+/* ── MEMBER CARDS ── */
+.member-card{background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;border-radius:14px;padding:12px 14px;margin-bottom:0.625rem;}
+.member-card.hidden-entry{opacity:0.45;border-color:#ffb3b3;border-style:dashed;}
+.member-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;}
+.member-name-block{flex:1;min-width:0;}
+.member-name{font-size:15px;font-weight:600;color:#2d0050;line-height:1.25;margin-bottom:2px;}
+.member-ig{font-size:12px;color:#4B0082;text-decoration:none;font-weight:500;word-break:break-all;}
+.member-ig:hover{text-decoration:underline;}
+.admin-hide-btn{flex-shrink:0;font-size:10px;background:#fff0f0;color:#cc0000;border:1px solid #ffcccc;border-radius:20px;padding:3px 8px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.admin-hide-btn.unhide{background:#f0fff0;color:#006600;border-color:#b3e6b3;}
+
+/* ── SOCIAL ICONS ── */
+.social-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.social-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:500;text-decoration:none;border:1.5px solid #e0d0f0;background:rgba(255,255,255,0.95);color:#4B0082;-webkit-tap-highlight-color:transparent;}
+.social-btn:hover{background:#f3e8ff;border-color:#d0b0f0;}
+
+/* ── AFFILIATE LINKS ── */
+.aff-section{margin-top:6px;}
+.aff-label-hdr{font-size:10px;font-weight:600;color:#9d6bbf;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.aff-row{display:flex;flex-wrap:wrap;gap:4px;}
+.aff-btn{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;text-decoration:none;background:#f3e8ff;color:#4B0082;border:1px solid #dcc6f0;-webkit-tap-highlight-color:transparent;}
+.aff-btn:hover{background:#e8d4f8;}
+.aff-btn.highlight{background:#4B0082;color:white;border-color:#4B0082;}
+.aff-pair{display:inline-flex;align-items:center;gap:4px;}
+.aff-code{font-size:10px;font-weight:600;color:#7b2fbe;background:#ede0ff;border:1px solid #dcc6f0;border-radius:20px;padding:3px 8px;white-space:nowrap;letter-spacing:0.3px;}
+.aff-code.highlight{color:white;background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.4);}
+
+/* ── BIO ── */
+.member-bio{font-size:11px;color:#666;line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid #f0e8f8;font-style:italic;}
+
+/* ── COMPANY TAB ── */
+.company-list{background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;border-radius:14px;overflow:hidden;margin-bottom:0.75rem;}
+.company-item{padding:11px 14px;border-bottom:1px solid #f5f0fa;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;-webkit-tap-highlight-color:transparent;}
+.company-item:last-child{border-bottom:none;}
+.company-item:hover{background:#f9f4ff;}
+.company-item:active{background:#f3e8ff;}
+.company-name-text{font-size:13px;color:#2d0050;font-weight:500;}
+.company-count{font-size:11px;color:#9d6bbf;background:#f3e8ff;border-radius:20px;padding:2px 8px;white-space:nowrap;}
+.company-back{display:flex;align-items:center;gap:6px;padding:9px 12px;background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;border-radius:12px;margin-bottom:0.75rem;cursor:pointer;font-size:12px;color:#4B0082;font-weight:500;-webkit-tap-highlight-color:transparent;user-select:none;}
+.company-back:hover{background:#f3e8ff;}
+.company-heading{font-size:14px;font-weight:600;color:#2d0050;margin-bottom:0.5rem;padding:0 2px;}
+
+/* ── RESULT COUNT ── */
+.result-count{font-size:11px;color:#9d6bbf;margin-bottom:8px;padding:0 2px;}
+
+/* ── LOADING / EMPTY ── */
+.loading-state{text-align:center;padding:3rem 1rem;color:#9d6bbf;font-size:13px;line-height:1.8;}
+.loading-spinner{font-size:30px;animation:spin 1s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty-state{text-align:center;padding:2rem 1rem;color:#9d6bbf;font-size:13px;line-height:1.8;}
+
+/* ── ADMIN BAR ── */
+.admin-bar{background:#2d0050;border-radius:12px;padding:8px 12px;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.admin-bar-text{font-size:11px;color:rgba(255,255,255,0.85);flex:1;}
+.admin-btn-sm{font-size:10px;border-radius:20px;padding:4px 10px;cursor:pointer;font-family:inherit;border:none;}
+.admin-show-btn{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3) !important;}
+.admin-logout-btn{background:#e05555;color:white;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem;}
+.modal-box{background:white;border-radius:16px;padding:1.5rem;width:100%;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.modal-title{font-size:16px;font-weight:600;color:#4B0082;margin-bottom:12px;}
+.modal-input{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #e0d0f0;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;}
+.modal-input:focus{border-color:#4B0082;}
+.modal-btn{width:100%;padding:11px;border-radius:10px;background:#4B0082;border:none;color:white;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;font-family:inherit;}
+.modal-btn:hover{background:#6a0dad;}
+.modal-cancel{width:100%;padding:9px;border-radius:10px;background:none;border:1.5px solid #e0d0f0;color:#9d6bbf;font-size:13px;cursor:pointer;font-family:inherit;}
+.modal-error{font-size:12px;color:#cc0000;margin-bottom:8px;padding:6px 10px;background:#fff0f0;border-radius:8px;display:none;}
+
+/* ── TRANSLATE ── */
+.translate-bar{display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;}
+.translate-select{font-size:12px;padding:4px 8px;border:1.5px solid #e0d0f0;border-radius:8px;color:#4B0082;background:white;font-family:inherit;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234B0082'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;}
+
+/* ── INTRO CARD ── */
+.intro-card{background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;border-radius:14px;padding:12px 14px;margin-bottom:0.5rem;}
+.intro-text{font-size:12px;color:#444;line-height:1.65;margin-bottom:8px;}
+.intro-how{font-size:11px;color:#7b2fbe;line-height:1.7;margin-bottom:8px;}
+.intro-submit{font-size:11px;color:#9d6bbf;}
+.intro-submit a{color:#4B0082;font-weight:600;text-decoration:none;}
+.intro-submit a:hover{text-decoration:underline;}
+
+/* ── COMPANY CHIPS (above search) ── */
+.chips-section{margin-bottom:0.75rem;}
+.chips-section-hdr{font-size:10px;font-weight:600;color:#9d6bbf;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;padding:0 2px;}
+.chips-cloud{display:flex;flex-wrap:wrap;gap:5px;}
+.co-chip{display:inline-flex;align-items:center;gap:3px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:500;background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;color:#4B0082;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
+.co-chip:hover{background:#f3e8ff;border-color:#d0b0f0;}
+.co-chip:active{background:#e8d4f8;}
+.co-chip-count{font-size:10px;color:#9d6bbf;font-weight:400;}
+
+/* ── FOOTER ── */
+.app-footer{text-align:center;padding:14px 0 4px;font-size:11px;color:#9d6bbf;}
+.app-footer a{color:#4B0082;text-decoration:none;font-weight:500;}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<!-- ═══════════════════════════════════════
+     HEADER
+═══════════════════════════════════════ -->
+<div class="header">
+  <div class="header-top-row">
+    <div style="flex:1;">
+      <div class="header-title" style="font-size:16px;font-weight:700;margin-bottom:2px;">Crafty Friends Directory</div>
+      <div class="header-accounts">
+        <div class="header-acct">brought to you by <a target="_blank" href="https://instagram.com/craftyengineer">@craftyengineer</a></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="nav-btn" id="refresh-btn" onclick="refreshData()" title="Refresh directory">&#8635;</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSLATE BAR -->
+<div class="translate-bar">
+  <select class="translate-select" id="translate-select" onchange="translatePage(this.value)">
+    <option value="">🌐 Translate</option>
+    <option value="">English</option>
+    <option value="af">Afrikaans</option>
+    <option value="sq">Shqip (Albanian)</option>
+    <option value="ar">العربية (Arabic)</option>
+    <option value="hy">Հայերեն (Armenian)</option>
+    <option value="bn">বাংলা (Bengali)</option>
+    <option value="bs">Bosanski (Bosnian)</option>
+    <option value="bg">Български (Bulgarian)</option>
+    <option value="my">ဗမာ (Burmese)</option>
+    <option value="zh-CN">中文简体 (Chinese Simplified)</option>
+    <option value="zh-TW">中文繁體 (Chinese Traditional)</option>
+    <option value="hr">Hrvatski (Croatian)</option>
+    <option value="cs">Čeština (Czech)</option>
+    <option value="da">Dansk (Danish)</option>
+    <option value="nl">Nederlands (Dutch)</option>
+    <option value="et">Eesti (Estonian)</option>
+    <option value="tl">Filipino</option>
+    <option value="fi">Suomi (Finnish)</option>
+    <option value="fr">Français (French)</option>
+    <option value="de">Deutsch (German)</option>
+    <option value="el">Ελληνικά (Greek)</option>
+    <option value="gu">ગુજરાતી (Gujarati)</option>
+    <option value="he">עברית (Hebrew)</option>
+    <option value="hi">हिन्दी (Hindi)</option>
+    <option value="hu">Magyar (Hungarian)</option>
+    <option value="is">Íslenska (Icelandic)</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="it">Italiano (Italian)</option>
+    <option value="ja">日本語 (Japanese)</option>
+    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+    <option value="ko">한국어 (Korean)</option>
+    <option value="lv">Latviešu (Latvian)</option>
+    <option value="lt">Lietuvių (Lithuanian)</option>
+    <option value="ms">Bahasa Melayu (Malay)</option>
+    <option value="ml">മലയാളം (Malayalam)</option>
+    <option value="mr">मराठी (Marathi)</option>
+    <option value="no">Norsk (Norwegian)</option>
+    <option value="fa">فارسی (Persian)</option>
+    <option value="pl">Polski (Polish)</option>
+    <option value="pt">Português (Portuguese)</option>
+    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+    <option value="ro">Română (Romanian)</option>
+    <option value="ru">Русский (Russian)</option>
+    <option value="sr">Српски (Serbian)</option>
+    <option value="sk">Slovenčina (Slovak)</option>
+    <option value="sl">Slovenščina (Slovenian)</option>
+    <option value="es">Español (Spanish)</option>
+    <option value="sw">Kiswahili (Swahili)</option>
+    <option value="sv">Svenska (Swedish)</option>
+    <option value="ta">தமிழ் (Tamil)</option>
+    <option value="te">తెలుగు (Telugu)</option>
+    <option value="th">ไทย (Thai)</option>
+    <option value="tr">Türkçe (Turkish)</option>
+    <option value="uk">Українська (Ukrainian)</option>
+    <option value="ur">اردو (Urdu)</option>
+    <option value="vi">Tiếng Việt (Vietnamese)</option>
+  </select>
+</div>
+
+<!-- ADMIN BAR (hidden until admin logs in) -->
+<div id="admin-bar" class="admin-bar" style="display:none;">
+  <span class="admin-bar-text">🔑 Admin Mode — tap 🙈 to hide duplicates</span>
+  <button id="admin-show-btn" class="admin-btn-sm admin-show-btn" onclick="toggleShowHidden()">Show Hidden</button>
+  <button class="admin-btn-sm admin-logout-btn" onclick="adminLogout()">Logout</button>
+</div>
+
+<!-- SUMMARY CHIPS -->
+<div id="summary-bar" class="summary-bar"></div>
+
+<!-- INTRO CARD -->
+<div class="intro-card">
+  <div class="intro-text">
+    Welcome! This directory is a resource for the card-making community to find fellow crafters' 
+    social media links, affiliate links, and discount codes — all in one place.
+  </div>
+  <div class="intro-how">
+    🔍 <strong>Search</strong> by name or @handle &nbsp;·&nbsp;
+    🔤 <strong>Browse</strong> A–Z &nbsp;·&nbsp;
+    🏢 <strong>Companies</strong> to find who has a link for a specific brand
+  </div>
+  <div class="intro-submit">
+    Not listed yet? <a href="https://docs.google.com/forms/d/e/1FAIpQLSfkM87liFOpQ8yoTRAKdRPAAbw-9UEq7bXn58QF35MPcdMD3Q/viewform?usp=header" target="_blank" id="submit-link">Submit your links here ↗</a>
+  </div>
+</div>
+
+<!-- COMPANY CHIPS (loaded dynamically) -->
+<div id="company-chips-wrap"></div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tab-search" onclick="setTab('search')">🔍 Search</div>
+  <div class="tab" id="tab-browse" onclick="setTab('browse')">🔤 Browse</div>
+  <div class="tab" id="tab-company" onclick="setTab('company')">🏢 Companies</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="view"></div>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:10px 0 4px;">
+  <a href="https://buymeacoffee.com/craftyengineer" target="_blank" rel="noopener"
+     style="display:inline-flex;align-items:center;gap:7px;background:#FFDD00;color:#000;font-weight:700;font-size:13px;padding:10px 22px;border-radius:22px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.13);">
+    ☕ Buy me a coffee
+  </a>
+  <div id="footer-credit" style="font-size:11px;color:#9d6bbf;margin-top:8px;font-weight:700;letter-spacing:0.2px;cursor:pointer;user-select:none;" onclick="footerTap()">
+    Made with ♥ by @craftyengineer
+  </div>
+</div>
+<div class="app-footer">craftyengineer.com &nbsp;·&nbsp; <a href="https://instagram.com/craftyengineer" target="_blank">@craftyengineer</a></div>
+
+</div><!-- end #wrap -->
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="admin-modal" class="modal-overlay" style="display:none;" onclick="modalOverlayClick(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">🔑 Admin Login</div>
+    <div id="modal-error" class="modal-error">Incorrect password — try again</div>
+    <input type="password" class="modal-input" id="admin-pw-input"
+      placeholder="Enter password"
+      onkeydown="if(event.key==='Enter')submitAdminLogin()">
+    <button class="modal-btn" onclick="submitAdminLogin()">Login</button>
+    <button class="modal-cancel" onclick="closeAdminModal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// ▶ CONFIGURATION — UPDATE THESE WHEN THE FORM CHANGES
+// ═══════════════════════════════════════════════════════════════
+
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXO1nBLdC53DlLJ55PdpvHvAH679jUuvPbn3F0sIgSc6N07rWMgSSocFHi_hhkaMUTeit3gmTKHJlR/pub?output=csv&gid=1516875906';
+
+// ── Column indices (0-based, Timestamp = col 0) ──
+const COL = {
+  NAME:      1,   // "What is your name?"
+  IG:        2,   // "What is your IG name?"
+  WEBSITE:   3,   // "What is your website?"
+  BLOG:      4,   // "What is your blog?"
+  YOUTUBE:   5,   // "What is your YouTube?"
+  FACEBOOK:  6,   // "What is your Facebook?"
+  PINTEREST: 7,   // "What is your Pinterest?"
+  THREADS:   8,   // "What is your Threads?"
+  X:         9,   // "What is your X?"
+  TIKTOK:    10,  // "What is your TikTok?"
+  AFF_START: 11,  // Affiliate Link #1  (through #12 = col 22)
+  AFF_COUNT: 12,  // 12 affiliate slots
+  BIO:       23,  // "Bio / About Me"
+  NOTES:     24,  // "Anything else to add?" — parsed for overflow links + extra bio
+};
+
+// ── Admin password — change this! ──
+const ADMIN_PASSWORD = 'crafty2025';
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let allMembers  = [];
+let activeTab   = 'search';
+let searchQuery = '';
+let activeLetter  = '';
+let selectedCompany = '';
+let isAdmin     = false;
+let showHidden  = false;
+let hiddenRows  = new Set();
+let footerTaps  = 0;
+let footerTimer = null;
+let _translateLang  = '';
+let _translateCache = {};
+let _translateBusy  = false;
+// Stable company list for index-based onclick (avoids escaping issues with names like "Stampin' Up!")
+let _companyListCache = [];
+
+// ═══════════════════════════════════════════════════════════════
+// LOCAL STORAGE
+// ═══════════════════════════════════════════════════════════════
+function loadHiddenRows() {
+  try {
+    const s = localStorage.getItem('cfd_hidden');
+    if (s) hiddenRows = new Set(JSON.parse(s));
+  } catch(e) {}
+}
+function saveHiddenRows() {
+  try { localStorage.setItem('cfd_hidden', JSON.stringify([...hiddenRows])); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CSV PARSER  (handles quoted fields with embedded newlines & commas)
+// ═══════════════════════════════════════════════════════════════
+function parseCSV(text) {
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const rows = [];
+  let i = 0, len = text.length;
+  while (i < len) {
+    const row = [];
+    while (i < len && text[i] !== '\n') {
+      if (text[i] === '"') {
+        i++;
+        let f = '';
+        while (i < len) {
+          if (text[i] === '"' && text[i+1] === '"') { f += '"'; i += 2; }
+          else if (text[i] === '"') { i++; break; }
+          else { f += text[i++]; }
+        }
+        row.push(f);
+        if (i < len && text[i] === ',') i++;
+      } else {
+        let s = i;
+        while (i < len && text[i] !== ',' && text[i] !== '\n') i++;
+        row.push(text.slice(s, i));
+        if (i < len && text[i] === ',') i++;
+      }
+    }
+    if (i < len && text[i] === '\n') i++;
+    if (row.some(c => c.trim())) rows.push(row);
+  }
+  return rows;
+}
+
+function cell(row, idx) {
+  if (idx < 0 || idx >= row.length) return '';
+  return (row[idx] || '').trim();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AFFILIATE LINK PARSER
+// ═══════════════════════════════════════════════════════════════
+
+// Extracts label + URL (+ optional discount code) from a single affiliate field.
+// Handles: "Company: URL", "Company - URL", "Company\nURL", bare URLs.
+// Optional code formats: "Company: URL | code: SAVE10", "Company: URL (code: SAVE10)"
+function parseAffLink(raw) {
+  if (!raw || !raw.trim()) return null;
+  raw = raw.replace(/\r/g, '').trim();
+  const urlM = raw.match(/https?:\/\/[^\s]+/);
+  if (!urlM) return null;
+  const url = urlM[0].replace(/[.,;)]+$/, '');
+  let before = raw.slice(0, urlM.index).replace(/\n/g, ' ').trim();
+  before = before.replace(/[\s\-–:|,]+$/, '').trim();
+  before = before.replace(/\s*[-–]\s*[Ll]ink\s*$/,'').trim();
+  before = before.replace(/[\s\-–:|,]+$/, '').trim();
+  const label = before || domainLabel(url);
+
+  // Look for a discount code after the URL
+  // Accepts: | code: X  /  (code: X)  /  code: X  /  discount: X  /  coupon: X
+  let code = '';
+  const afterUrl = raw.slice(urlM.index + urlM[0].length);
+  const codeM = afterUrl.match(/[|\(\s]*(?:code|discount|coupon)\s*:\s*([^\s\)|,]+)/i);
+  if (codeM) code = codeM[1].trim();
+
+  return { label, url, code };
+}
+
+// Extract domain name as fallback label
+function domainLabel(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    const name = host.split('.')[0];
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  } catch(e) { return 'Link'; }
+}
+
+// Parse the notes/bio field: pull out any embedded links, return {extraLinks, bio}
+function parseNotesField(notes) {
+  if (!notes || !notes.trim()) return { extraLinks: [], bio: '' };
+  notes = notes.replace(/\r/g, '');
+
+  // Collect all URL positions
+  const urlRe = /https?:\/\/[^\s,]+/g;
+  const found = [];
+  let m;
+  while ((m = urlRe.exec(notes)) !== null) {
+    found.push({ url: m[0].replace(/[.,;)]+$/, ''), start: m.index, end: m.index + m[0].length });
+  }
+
+  if (!found.length) return { extraLinks: [], bio: notes.trim() };
+
+  const extraLinks = [];
+  const nonLinkParts = [];
+  let cursor = 0;
+
+  for (let i = 0; i < found.length; i++) {
+    const { url, start, end } = found[i];
+    // Text between previous URL (or start) and this URL
+    let chunk = notes.slice(cursor, start);
+    // Try to find a label at the tail of this chunk
+    // Match: optional preceding text + label (word chars, spaces, &, ') + separator + end
+    const labelM = chunk.match(/([A-Za-z0-9][A-Za-z0-9\s&'.!+\-]*)(?:\s*[:–\-|]\s*|\s+)$/);
+    let label = '';
+    if (labelM) {
+      label = labelM[1].trim();
+      // Remove the label from the chunk so it doesn't appear in bio
+      chunk = chunk.slice(0, chunk.length - labelM[0].length);
+    }
+    // Ignore junk prefixes like "2 more links lol"
+    if (!label || /^\d+\s+more/i.test(label) || /^lol$/i.test(label)) {
+      label = domainLabel(url);
+    }
+    if (chunk.trim()) nonLinkParts.push(chunk.trim());
+    extraLinks.push({ label, url });
+    cursor = end;
+  }
+
+  // Anything after the last URL
+  const tail = notes.slice(cursor).trim();
+  if (tail) nonLinkParts.push(tail);
+
+  // Bio: join non-link text, clean up "N more links lol" fragments
+  const bio = nonLinkParts.join(' ')
+    .replace(/\d+\s+more\s+links?\s*(lol)?\s*/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  return { extraLinks, bio };
+}
+
+function normalizeUrl(url) {
+  if (!url) return '';
+  url = url.trim();
+  if (!url) return '';
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  return url;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════════════════════
+function loadData() {
+  document.getElementById('view').innerHTML =
+    '<div class="loading-state"><span class="loading-spinner">⟳</span><br>Loading directory...</div>';
+
+  fetch(CSV_URL + '&nocache=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(processData)
+    .catch(err => {
+      document.getElementById('view').innerHTML =
+        '<div class="empty-state">⚠️ Could not load the directory.<br><small>Check your connection and tap ⟳ to retry.</small></div>';
+      console.error('Load error:', err);
+    });
+}
+
+function processData(csvText) {
+  const rows = parseCSV(csvText);
+  if (rows.length < 2) {
+    document.getElementById('view').innerHTML = '<div class="empty-state">No data found in spreadsheet.</div>';
+    return;
+  }
+
+  allMembers = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const name = cell(row, COL.NAME);
+    if (!name) continue;
+
+    const ig = cell(row, COL.IG).replace(/^@/, '').trim();
+
+    // Build affiliate links from contiguous columns #1–12
+    const affLinks = [];
+    for (let a = 0; a < COL.AFF_COUNT; a++) {
+      const raw = cell(row, COL.AFF_START + a);
+      const parsed = parseAffLink(raw);
+      if (parsed) affLinks.push(parsed);
+    }
+
+    // "Anything else to add?" — parse for any overflow affiliate links
+    const notesRaw = cell(row, COL.NOTES);
+    const { extraLinks } = parseNotesField(notesRaw);
+    affLinks.push(...extraLinks);
+
+    // Bio: use dedicated "Bio / About Me" column; fall back to non-link text in notes
+    let bio = cell(row, COL.BIO);
+    if (!bio) {
+      const { bio: notesBio } = parseNotesField(notesRaw);
+      bio = notesBio;
+    }
+
+    // Deduplicate affiliate links by URL
+    const seenUrls = new Set();
+    const uniqueAff = affLinks.filter(a => {
+      if (seenUrls.has(a.url)) return false;
+      seenUrls.add(a.url); return true;
+    });
+
+    const website = normalizeUrl(cell(row, COL.WEBSITE));
+    const blog    = normalizeUrl(cell(row, COL.BLOG));
+
+    allMembers.push({
+      rowIndex: i,
+      name,
+      ig,
+      // Deduplicate website/blog: if same URL, only keep website
+      website,
+      blog: (blog && blog !== website) ? blog : '',
+      youtube:   normalizeUrl(cell(row, COL.YOUTUBE)),
+      facebook:  normalizeUrl(cell(row, COL.FACEBOOK)),
+      tiktok:    normalizeUrl(cell(row, COL.TIKTOK)),
+      pinterest: normalizeUrl(cell(row, COL.PINTEREST)),
+      threads:   normalizeUrl(cell(row, COL.THREADS)),
+      x:         normalizeUrl(cell(row, COL.X)),
+      affLinks: uniqueAff,
+      bio,
+    });
+  }
+
+  // Sort alphabetically by name
+  allMembers.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+
+  renderSummary();
+  render();
+  if (_translateLang) setTimeout(translateDOM, 80);
+}
+
+function refreshData() {
+  const btn = document.getElementById('refresh-btn');
+  if (btn) btn.style.opacity = '0.4';
+  loadData();
+  setTimeout(() => { const b = document.getElementById('refresh-btn'); if (b) b.style.opacity = '1'; }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUMMARY BAR
+// ═══════════════════════════════════════════════════════════════
+function renderSummary() {
+  const vis = visibleMembers();
+  const cos = buildCompanyList(vis);
+  document.getElementById('summary-bar').innerHTML =
+    `<div class="chip"><span>${vis.length}</span>Members</div>` +
+    `<div class="chip"><span>${cos.length}</span>Companies</div>`;
+  renderCompanyChips(cos);
+}
+
+function renderCompanyChips(cos) {
+  const wrap = document.getElementById('company-chips-wrap');
+  if (!wrap) return;
+  if (!cos.length) { wrap.innerHTML = ''; return; }
+  // Store for onclick index lookup
+  _chipsCompanyList = cos;
+  let html = '<div class="chips-section">';
+  html += '<div class="chips-section-hdr">🏢 Browse by Company</div>';
+  html += '<div class="chips-cloud">';
+  cos.forEach((co, idx) => {
+    html += `<button class="co-chip" onclick="jumpToCompany(${idx})">${escHtml(co.name)} <span class="co-chip-count">${co.count}</span></button>`;
+  });
+  html += '</div></div>';
+  wrap.innerHTML = html;
+}
+
+let _chipsCompanyList = [];
+
+function jumpToCompany(idx) {
+  const co = _chipsCompanyList[idx];
+  if (!co) return;
+  activeTab = 'company';
+  selectedCompany = co.name;
+  ['search','browse','company'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.classList.toggle('active', t === 'company');
+  });
+  renderCompanyResults();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER DISPATCHER
+// ═══════════════════════════════════════════════════════════════
+function setTab(tab) {
+  activeTab = tab;
+  searchQuery = '';
+  activeLetter = '';
+  selectedCompany = '';
+  ['search','browse','company'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.classList.toggle('active', t === tab);
+  });
+  render();
+}
+
+function render() {
+  if      (activeTab === 'search')  renderSearch();
+  else if (activeTab === 'browse')  renderBrowse();
+  else if (activeTab === 'company') renderCompany();
+}
+
+// Visible members: hide flagged rows unless admin+showHidden
+function visibleMembers(all) {
+  const src = all || allMembers;
+  return showHidden ? src : src.filter(m => !hiddenRows.has(m.rowIndex));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEARCH TAB
+// ═══════════════════════════════════════════════════════════════
+function renderSearch() {
+  let html =
+    `<div class="search-wrap">` +
+    `<span class="search-icon">🔍</span>` +
+    `<input type="text" class="search-input" id="search-input"` +
+    ` placeholder="Search by name or @IG handle…"` +
+    ` value="${escAttr(searchQuery)}" oninput="onSearch(this.value)" autocomplete="off" autocorrect="off">` +
+    `<button class="search-clear" id="search-clear" onclick="clearSearch()"` +
+    `${searchQuery ? ' style="display:block"' : ''}>✕</button>` +
+    `</div>`;
+
+  if (!allMembers.length) {
+    html += '<div class="loading-state"><span class="loading-spinner">⟳</span><br>Loading…</div>';
+  } else {
+    const q = searchQuery.toLowerCase().replace(/^@/, '');
+    const filtered = q
+      ? visibleMembers().filter(m =>
+          m.name.toLowerCase().includes(q) ||
+          m.ig.toLowerCase().includes(q))
+      : visibleMembers();
+
+    if (!filtered.length && searchQuery) {
+      html += `<div class="empty-state">No members found for <strong>${escHtml(searchQuery)}</strong></div>`;
+    } else {
+      if (searchQuery) html += `<div class="result-count">${filtered.length} member${filtered.length !== 1 ? 's' : ''} found</div>`;
+      html += filtered.map(m => memberCard(m, '')).join('');
+    }
+  }
+
+  setView(html);
+  // Restore focus + cursor after re-render
+  const inp = document.getElementById('search-input');
+  if (inp && searchQuery) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+}
+
+function onSearch(val) {
+  searchQuery = val;
+  renderSearch();
+}
+
+function clearSearch() {
+  searchQuery = '';
+  renderSearch();
+  document.getElementById('search-input')?.focus();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BROWSE TAB
+// ═══════════════════════════════════════════════════════════════
+function renderBrowse() {
+  const vis = visibleMembers();
+  const hasLetter = new Set(vis.map(m => m.name.charAt(0).toUpperCase()).filter(Boolean));
+
+  // A-Z bar
+  let html = '<div class="az-bar">';
+  for (let c = 65; c <= 90; c++) {
+    const letter = String.fromCharCode(c);
+    const has = hasLetter.has(letter);
+    const active = activeLetter === letter;
+    html += `<button class="az-btn${active ? ' active' : ''}${!has ? ' inactive' : ''}"` +
+      (has ? ` onclick="pickLetter('${letter}')"` : '') +
+      `>${letter}</button>`;
+  }
+  html += `<button class="az-btn all-btn${!activeLetter ? ' active' : ''}" onclick="pickLetter('')">All</button>`;
+  html += '</div>';
+
+  const shown = activeLetter
+    ? vis.filter(m => m.name.charAt(0).toUpperCase() === activeLetter)
+    : vis;
+
+  if (activeLetter) html += `<div class="result-count">${shown.length} member${shown.length !== 1 ? 's' : ''} — ${activeLetter}</div>`;
+  else html += `<div class="result-count">${shown.length} members</div>`;
+
+  html += shown.map(m => memberCard(m, '')).join('');
+  if (!shown.length) html += '<div class="empty-state">No members for this letter</div>';
+
+  setView(html);
+}
+
+function pickLetter(letter) {
+  activeLetter = letter;
+  renderBrowse();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMPANIES TAB
+// ═══════════════════════════════════════════════════════════════
+function buildCompanyList(members) {
+  const map = new Map();
+  for (const m of members) {
+    for (const aff of m.affLinks) {
+      const label = aff.label.trim();
+      if (label) map.set(label, (map.get(label) || 0) + 1);
+    }
+  }
+  return [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'base' }))
+    .map(([name, count]) => ({ name, count }));
+}
+
+function renderCompany() {
+  selectedCompany ? renderCompanyResults() : renderCompanyList();
+}
+
+function renderCompanyList() {
+  const vis = visibleMembers();
+  _companyListCache = buildCompanyList(vis);
+
+  let html =
+    `<div class="search-wrap">` +
+    `<span class="search-icon">🔍</span>` +
+    `<input type="text" class="search-input" id="co-search"` +
+    ` placeholder="Search companies…" oninput="filterCompanies(this.value)" autocomplete="off">` +
+    `</div>` +
+    `<div id="co-list">` +
+    renderCompanyItems(_companyListCache) +
+    `</div>`;
+
+  setView(html);
+}
+
+// Stable list of currently-displayed companies (index used in onclick)
+let _displayedCompanies = [];
+
+function renderCompanyItems(list) {
+  _displayedCompanies = list;
+  if (!list.length) return '<div class="empty-state">No companies found</div>';
+  let html = '<div class="company-list">';
+  list.forEach((co, idx) => {
+    html += `<div class="company-item" onclick="pickCompany(${idx})">` +
+      `<span class="company-name-text">${escHtml(co.name)}</span>` +
+      `<span class="company-count">${co.count} member${co.count !== 1 ? 's' : ''}</span>` +
+      `</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function filterCompanies(q) {
+  const filtered = q
+    ? _companyListCache.filter(co => co.name.toLowerCase().includes(q.toLowerCase()))
+    : _companyListCache;
+  const wrap = document.getElementById('co-list');
+  if (wrap) wrap.innerHTML = renderCompanyItems(filtered);
+}
+
+function pickCompany(idx) {
+  const co = _displayedCompanies[idx];
+  if (!co) return;
+  selectedCompany = co.name;
+  renderCompanyResults();
+}
+
+function renderCompanyResults() {
+  const vis = visibleMembers();
+  const members = vis.filter(m => m.affLinks.some(a => a.label === selectedCompany));
+
+  let html =
+    `<div class="company-back" onclick="backToCompanies()">← Back to Companies</div>` +
+    `<div class="company-heading">${escHtml(selectedCompany)}</div>` +
+    `<div class="result-count">${members.length} member${members.length !== 1 ? 's' : ''}</div>` +
+    members.map(m => memberCard(m, selectedCompany)).join('');
+
+  if (!members.length) html += '<div class="empty-state">No members found for this company</div>';
+
+  setView(html);
+}
+
+function backToCompanies() {
+  selectedCompany = '';
+  renderCompanyList();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MEMBER CARD
+// ═══════════════════════════════════════════════════════════════
+function memberCard(m, highlightCompany) {
+  const isHidden = hiddenRows.has(m.rowIndex);
+  let html = `<div class="member-card${isHidden ? ' hidden-entry' : ''}">`;
+
+  // ── Header: name, IG, admin controls ──
+  html += '<div class="member-header">';
+  html += '<div class="member-name-block">';
+  html += `<div class="member-name">${escHtml(m.name)}</div>`;
+  if (m.ig) {
+    html += `<a class="member-ig" href="https://instagram.com/${encodeURIComponent(m.ig)}" target="_blank" rel="noopener">@${escHtml(m.ig)} ↗</a>`;
+  }
+  html += '</div>';
+  if (isAdmin) {
+    html += `<button class="admin-hide-btn${isHidden ? ' unhide' : ''}" onclick="toggleHide(${m.rowIndex})">${isHidden ? '👁 Show' : '🙈 Hide'}</button>`;
+  }
+  html += '</div>';
+
+  // ── Social platform links ──
+  const socials = [
+    m.website   && { icon: '🌐', label: 'Website',   url: m.website },
+    m.blog      && { icon: '📝', label: 'Blog',      url: m.blog },
+    m.youtube   && { icon: '▶️',  label: 'YouTube',  url: m.youtube },
+    m.facebook  && { icon: '📘', label: 'Facebook',  url: m.facebook },
+    m.tiktok    && { icon: '🎵', label: 'TikTok',    url: m.tiktok },
+    m.pinterest && { icon: '📌', label: 'Pinterest', url: m.pinterest },
+    m.threads   && { icon: '🧵', label: 'Threads',   url: m.threads },
+    m.x         && { icon: '✖️',  label: 'X',        url: m.x },
+  ].filter(Boolean);
+
+  if (socials.length) {
+    html += '<div class="social-row">';
+    for (const s of socials) {
+      html += `<a class="social-btn" href="${escAttr(s.url)}" target="_blank" rel="noopener">${s.icon} ${s.label}</a>`;
+    }
+    html += '</div>';
+  }
+
+  // ── Affiliate links ──
+  if (m.affLinks.length) {
+    html += '<div class="aff-section">';
+    html += '<div class="aff-label-hdr">🔗 Affiliate Links</div>';
+    html += '<div class="aff-row">';
+    for (const aff of m.affLinks) {
+      const hl = highlightCompany && aff.label === highlightCompany;
+      html += `<span class="aff-pair">`;
+      html += `<a class="aff-btn${hl ? ' highlight' : ''}" href="${escAttr(aff.url)}" target="_blank" rel="noopener">${escHtml(aff.label)} ↗</a>`;
+      if (aff.code) {
+        html += `<span class="aff-code${hl ? ' highlight' : ''}">CODE: ${escHtml(aff.code)}</span>`;
+      }
+      html += `</span>`;
+    }
+    html += '</div></div>';
+  }
+
+  // ── Bio ──
+  if (m.bio) {
+    html += `<div class="member-bio">${escHtml(m.bio)}</div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════════════════
+function footerTap() {
+  footerTaps++;
+  clearTimeout(footerTimer);
+  footerTimer = setTimeout(() => footerTaps = 0, 1500);
+  if (footerTaps >= 3) {
+    footerTaps = 0;
+    if (isAdmin) { adminLogout(); return; }
+    document.getElementById('admin-modal').style.display = 'flex';
+    document.getElementById('modal-error').style.display = 'none';
+    document.getElementById('admin-pw-input').value = '';
+    setTimeout(() => document.getElementById('admin-pw-input')?.focus(), 120);
+  }
+}
+
+function modalOverlayClick(e) {
+  if (e.target === document.getElementById('admin-modal')) closeAdminModal();
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-modal').style.display = 'none';
+}
+
+function submitAdminLogin() {
+  const pw = document.getElementById('admin-pw-input').value;
+  if (pw === ADMIN_PASSWORD) {
+    isAdmin = true;
+    closeAdminModal();
+    document.getElementById('admin-bar').style.display = 'flex';
+    render();
+  } else {
+    document.getElementById('modal-error').style.display = 'block';
+    document.getElementById('admin-pw-input').value = '';
+    document.getElementById('admin-pw-input').focus();
+  }
+}
+
+function adminLogout() {
+  isAdmin = false;
+  showHidden = false;
+  document.getElementById('admin-bar').style.display = 'none';
+  const btn = document.getElementById('admin-show-btn');
+  if (btn) btn.textContent = 'Show Hidden';
+  renderSummary();
+  render();
+}
+
+function toggleShowHidden() {
+  showHidden = !showHidden;
+  const btn = document.getElementById('admin-show-btn');
+  if (btn) btn.textContent = showHidden ? 'Hide Hidden' : 'Show Hidden';
+  renderSummary();
+  render();
+}
+
+function toggleHide(rowIndex) {
+  if (hiddenRows.has(rowIndex)) hiddenRows.delete(rowIndex);
+  else hiddenRows.add(rowIndex);
+  saveHiddenRows();
+  renderSummary();
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;');
+}
+function setView(html) {
+  document.getElementById('view').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TRANSLATE  (same engine as Hop Planner)
+// ═══════════════════════════════════════════════════════════════
+function translatePage(lang) {
+  _translateLang = lang;
+  if (!lang) { render(); return; }
+  translateDOM();
+}
+
+async function translateText(text, lang) {
+  const key = `en→${lang}`;
+  if (!_translateCache[key]) _translateCache[key] = {};
+  if (_translateCache[key][text]) return _translateCache[key][text];
+  try {
+    const resp = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`);
+    const data = await resp.json();
+    const out = data[0].map(s => s[0]).join('');
+    _translateCache[key][text] = out;
+    return out;
+  } catch(e) { return text; }
+}
+
+async function translateBatch(texts, lang) {
+  const key = `en→${lang}`;
+  if (!_translateCache[key]) _translateCache[key] = {};
+  const needed = texts.filter(t => !_translateCache[key][t] && t.trim().length > 0);
+  if (!needed.length) return;
+  const batches = [];
+  let cur = [], curLen = 0;
+  for (const t of needed) {
+    if (curLen + t.length > 4000 && cur.length) { batches.push(cur); cur = []; curLen = 0; }
+    cur.push(t); curLen += t.length + 1;
+  }
+  if (cur.length) batches.push(cur);
+  for (const batch of batches) {
+    try {
+      const resp = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(batch.join('\n'))}`);
+      const data = await resp.json();
+      const parts = data[0].map(s => s[0]).join('').split('\n');
+      batch.forEach((orig, i) => { _translateCache[key][orig] = (parts[i] || orig).trim(); });
+    } catch(e) { batch.forEach(t => { _translateCache[key][t] = t; }); }
+  }
+}
+
+function getTextNodes(root) {
+  const nodes = [];
+  const skip = new Set(['SCRIPT','STYLE','TEXTAREA','SELECT','OPTION','INPUT','SVG','IMG']);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (skip.has(node.parentElement?.tagName)) return NodeFilter.FILTER_REJECT;
+      if (node.parentElement?.closest('.translate-bar')) return NodeFilter.FILTER_REJECT;
+      const t = node.textContent.trim();
+      if (!t || t.length < 2) return NodeFilter.FILTER_REJECT;
+      if (/^[\d\/:.%\s·—–\-✓✗☁️⭐📅🔍🔤🏢↗♥️☕🌐📝▶️📘🎵📌📌🔗]+$/.test(t)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  return nodes;
+}
+
+async function translateDOM() {
+  const lang = _translateLang;
+  if (!lang || _translateBusy) return;
+  _translateBusy = true;
+  try {
+    const nodes = [
+      ...getTextNodes(document.getElementById('view') || document.body),
+      ...getTextNodes(document.getElementById('summary-bar') || document.createElement('div')),
+    ];
+    const unique = [...new Set(nodes.map(n => n.textContent.trim()).filter(t => t.length >= 2))];
+    await translateBatch(unique, lang);
+    if (_translateLang !== lang) { _translateBusy = false; return; }
+    const cache = _translateCache[`en→${lang}`] || {};
+    nodes.forEach(node => {
+      const orig = node.textContent.trim();
+      if (cache[orig]) node.textContent = node.textContent.replace(orig, cache[orig]);
+    });
+  } catch(e) { console.log('translateDOM error:', e); }
+  _translateBusy = false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+loadHiddenRows();
+loadData();
+</script>
+</body>
+</html>
