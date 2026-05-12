@@ -307,6 +307,8 @@ body{
 // ═══════════════════════════════════════════════════════════════
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXO1nBLdC53DlLJ55PdpvHvAH679jUuvPbn3F0sIgSc6N07rWMgSSocFHi_hhkaMUTeit3gmTKHJlR/pub?output=csv&gid=1516875906';
+// Companies reference tab — Column A: Canonical Name, Column B: Aliases (comma-separated)
+const COMPANIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXO1nBLdC53DlLJ55PdpvHvAH679jUuvPbn3F0sIgSc6N07rWMgSSocFHi_hhkaMUTeit3gmTKHJlR/pub?output=csv&gid=212072056';
 
 // ── Column indices (0-based, Timestamp = col 0) ──
 const COL = {
@@ -320,14 +322,19 @@ const COL = {
   THREADS:   8,   // "What is your Threads?"
   X:         9,   // "What is your X?"
   TIKTOK:    10,  // "What is your TikTok?"
-  AFF_START: 11,  // Affiliate Link #1  (through #12 = col 22)
-  AFF_COUNT: 12,  // 12 affiliate slots
-  BIO:       23,  // "Bio / About Me"
-  NOTES:     24,  // "Anything else to add?" — parsed for overflow links + extra bio
+  // Affiliate pairs: [company col, link col] — 10 slots
+  AFF_PAIRS: [
+    [11,12],[13,14],[15,16],[17,18],[19,20],
+    [21,22],[23,24],[25,26],[27,28],[29,30],
+  ],
+  UNLISTED_CO:   31, // "If your affiliate was not listed, what is the name?"
+  UNLISTED_LINK: 32, // "Unlisted Company Affiliate Link"
+  BIO:           33, // "Bio / About Me"
+  NOTES:         34, // "Anything else to add?" — extra bio text
 };
 
 // ── Admin password — change this! ──
-const ADMIN_PASSWORD = 'crafty2025';
+const ADMIN_PASSWORD = 'lance2026';
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
@@ -347,6 +354,7 @@ let _translateCache = {};
 let _translateBusy  = false;
 // Stable company list for index-based onclick (avoids escaping issues with names like "Stampin' Up!")
 let _companyListCache = [];
+let companyAliasMap = new Map(); // lowercase alias/canonical → canonical name
 
 // ═══════════════════════════════════════════════════════════════
 // LOCAL STORAGE
@@ -359,6 +367,50 @@ function loadHiddenRows() {
 }
 function saveHiddenRows() {
   try { localStorage.setItem('cfd_hidden', JSON.stringify([...hiddenRows])); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMPANY ALIAS MAP
+// ═══════════════════════════════════════════════════════════════
+
+// Builds companyAliasMap from the COMPANIES sheet tab.
+// Row format: Col A = Canonical Name, Col B = comma-separated aliases (optional)
+function loadCompanyAliases(csvText) {
+  companyAliasMap = new Map();
+  if (!csvText || !csvText.trim()) return;
+  const rows = parseCSV(csvText);
+  // Skip header row (row 0)
+  for (let i = 1; i < rows.length; i++) {
+    const canonical = (rows[i][0] || '').trim();
+    if (!canonical) continue;
+    // Map the canonical name to itself (handles case differences)
+    companyAliasMap.set(canonical.toLowerCase(), canonical);
+    // Map any aliases → canonical
+    const aliasCell = (rows[i][1] || '').trim();
+    if (aliasCell) {
+      aliasCell.split(',').forEach(alias => {
+        const a = alias.trim();
+        if (a) companyAliasMap.set(a.toLowerCase(), canonical);
+      });
+    }
+  }
+  console.log(`Loaded ${companyAliasMap.size} company name mappings`);
+}
+
+// Normalizes a raw company label using the alias map.
+// Falls back to basic cleanup (trim, remove trailing punctuation) if no match found.
+function normalizeCompanyLabel(label) {
+  if (!label) return label;
+  // Basic cleanup
+  let cleaned = label.trim().replace(/\.+$/, '').replace(/\s+/g, ' ').trim();
+  // Try exact lowercase match
+  const key = cleaned.toLowerCase();
+  if (companyAliasMap.has(key)) return companyAliasMap.get(key);
+  // Try with trailing punctuation stripped
+  const key2 = key.replace(/[.!,;:'"]+$/, '').trim();
+  if (companyAliasMap.has(key2)) return companyAliasMap.get(key2);
+  // No match — return cleaned label as-is (new/unknown company, that's fine)
+  return cleaned || label;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -403,9 +455,25 @@ function cell(row, idx) {
 // AFFILIATE LINK PARSER
 // ═══════════════════════════════════════════════════════════════
 
-// Extracts label + URL (+ optional discount code) from a single affiliate field.
-// Handles: "Company: URL", "Company - URL", "Company\nURL", bare URLs.
-// Optional code formats: "Company: URL | code: SAVE10", "Company: URL (code: SAVE10)"
+// NEW FORMAT: company and URL are in separate columns.
+// Optionally include a discount code after the URL:
+//   "https://link.com | code: SAVE10"  or  "https://link.com (code: SAVE10)"
+function parseLinkField(company, raw) {
+  if (!raw || !raw.trim()) return null;
+  raw = raw.replace(/\r/g, '').trim();
+  const urlM = raw.match(/https?:\/\/[^\s]+/);
+  if (!urlM) return null;
+  const url = urlM[0].replace(/[.,;)]+$/, '');
+  const label = normalizeCompanyLabel(company || domainLabel(url));
+  let code = '';
+  const afterUrl = raw.slice(urlM.index + urlM[0].length);
+  const codeM = afterUrl.match(/[|\(\s]*(?:code|discount|coupon)\s*:\s*([^\s\)|,]+)/i);
+  if (codeM) code = codeM[1].trim();
+  return { label, url, code };
+}
+
+// LEGACY FORMAT: parses combined "Company: URL" style from old notes fields.
+// Kept for backward compatibility with older entries.
 function parseAffLink(raw) {
   if (!raw || !raw.trim()) return null;
   raw = raw.replace(/\r/g, '').trim();
@@ -416,15 +484,19 @@ function parseAffLink(raw) {
   before = before.replace(/[\s\-–:|,]+$/, '').trim();
   before = before.replace(/\s*[-–]\s*[Ll]ink\s*$/,'').trim();
   before = before.replace(/[\s\-–:|,]+$/, '').trim();
-  const label = before || domainLabel(url);
-
-  // Look for a discount code after the URL
-  // Accepts: | code: X  /  (code: X)  /  code: X  /  discount: X  /  coupon: X
-  let code = '';
+  // Detect embedded code in label (e.g. "Studio 15% off code ARTEMIS")
+  let embeddedCode = '';
+  const embeddedCodeM = before.match(/(?:\d+%?\s*off\s+)?(?:use\s+)?(?:code|coupon|discount)\s+([A-Z0-9_\-]+)/i);
+  if (embeddedCodeM) {
+    embeddedCode = embeddedCodeM[1].trim().toUpperCase();
+    before = before.replace(embeddedCodeM[0], '').trim();
+    before = before.replace(/[\s\-–:|,]+$/, '').trim();
+  }
+  const label = normalizeCompanyLabel(before || domainLabel(url));
+  let code = embeddedCode;
   const afterUrl = raw.slice(urlM.index + urlM[0].length);
   const codeM = afterUrl.match(/[|\(\s]*(?:code|discount|coupon)\s*:\s*([^\s\)|,]+)/i);
   if (codeM) code = codeM[1].trim();
-
   return { label, url, code };
 }
 
@@ -473,6 +545,7 @@ function parseNotesField(notes) {
     if (!label || /^\d+\s+more/i.test(label) || /^lol$/i.test(label)) {
       label = domainLabel(url);
     }
+    label = normalizeCompanyLabel(label);
     if (chunk.trim()) nonLinkParts.push(chunk.trim());
     extraLinks.push({ label, url });
     cursor = end;
@@ -506,14 +579,21 @@ function loadData() {
   document.getElementById('view').innerHTML =
     '<div class="loading-state"><span class="loading-spinner">⟳</span><br>Loading directory...</div>';
 
-  fetch(CSV_URL + '&nocache=' + Date.now())
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-    .then(processData)
-    .catch(err => {
-      document.getElementById('view').innerHTML =
-        '<div class="empty-state">⚠️ Could not load the directory.<br><small>Check your connection and tap ⟳ to retry.</small></div>';
-      console.error('Load error:', err);
-    });
+  const nc = '&nocache=' + Date.now();
+  // Load companies reference tab + member data in parallel
+  Promise.all([
+    fetch(COMPANIES_CSV_URL + nc).then(r => r.text()).catch(() => ''),
+    fetch(CSV_URL + nc).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+  ])
+  .then(([companiesCsv, membersCsv]) => {
+    loadCompanyAliases(companiesCsv); // build normalization map first
+    processData(membersCsv);          // then process members (labels get normalized)
+  })
+  .catch(err => {
+    document.getElementById('view').innerHTML =
+      '<div class="empty-state">⚠️ Could not load the directory.<br><small>Check your connection and tap ⟳ to retry.</small></div>';
+    console.error('Load error:', err);
+  });
 }
 
 function processData(csvText) {
@@ -532,30 +612,32 @@ function processData(csvText) {
 
     const ig = cell(row, COL.IG).replace(/^@/, '').trim();
 
-    // Build affiliate links from contiguous columns #1–12
+    // Build affiliate links from paired company+link columns
     const affLinks = [];
-    for (let a = 0; a < COL.AFF_COUNT; a++) {
-      const raw = cell(row, COL.AFF_START + a);
-      const parsed = parseAffLink(raw);
+    for (const [coCol, linkCol] of COL.AFF_PAIRS) {
+      const company = cell(row, coCol);
+      const linkRaw = cell(row, linkCol);
+      const parsed = parseLinkField(company, linkRaw);
       if (parsed) affLinks.push(parsed);
     }
 
-    // "Anything else to add?" — parse for any overflow affiliate links
-    const notesRaw = cell(row, COL.NOTES);
-    const { extraLinks } = parseNotesField(notesRaw);
-    affLinks.push(...extraLinks);
+    // Handle the "unlisted company" slot
+    const unlistedCo   = cell(row, COL.UNLISTED_CO);
+    const unlistedLink = cell(row, COL.UNLISTED_LINK);
+    const unlistedParsed = parseLinkField(unlistedCo, unlistedLink);
+    if (unlistedParsed) affLinks.push(unlistedParsed);
 
-    // Bio: use dedicated "Bio / About Me" column; fall back to non-link text in notes
+    // Bio / About Me column
     let bio = cell(row, COL.BIO);
-    if (!bio) {
-      const { bio: notesBio } = parseNotesField(notesRaw);
-      bio = notesBio;
-    }
+
+    // "Anything else to add?" — pure text now, used as additional bio if bio is empty
+    const notesRaw = cell(row, COL.NOTES);
+    if (!bio && notesRaw) bio = notesRaw.trim();
 
     // Deduplicate affiliate links by URL
     const seenUrls = new Set();
     const uniqueAff = affLinks.filter(a => {
-      if (seenUrls.has(a.url)) return false;
+      if (!a.url || seenUrls.has(a.url)) return false;
       seenUrls.add(a.url); return true;
     });
 
