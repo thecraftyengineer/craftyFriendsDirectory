@@ -98,6 +98,17 @@ body{
 .company-back:hover{background:#f3e8ff;}
 .company-heading{font-size:14px;font-weight:600;color:#2d0050;margin-bottom:0.5rem;padding:0 2px;}
 
+/* ── YOUTUBE TAB ── */
+.yt-card{background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;border-radius:14px;padding:11px 14px;margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.yt-info{flex:1;min-width:0;}
+.yt-name{font-size:13px;font-weight:600;color:#2d0050;margin-bottom:2px;}
+.yt-ig{font-size:11px;color:#4B0082;text-decoration:none;font-weight:500;}
+.yt-ig:hover{text-decoration:underline;}
+.yt-channel{font-size:11px;color:#888;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.yt-sub-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:#FF0000;color:white;border:none;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;text-decoration:none;-webkit-tap-highlight-color:transparent;cursor:pointer;}
+.yt-sub-btn:hover{background:#cc0000;}
+.yt-count{font-size:11px;color:#9d6bbf;margin-bottom:8px;padding:0 2px;}
+
 /* ── RESULT COUNT ── */
 .result-count{font-size:11px;color:#9d6bbf;margin-bottom:8px;padding:0 2px;}
 
@@ -265,9 +276,10 @@ body{
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active" id="tab-search" onclick="setTab('search')">🔍 Search</div>
+  <div class="tab active" id="tab-search" onclick="setTab('search')">🔍 Name / IG</div>
   <div class="tab" id="tab-company" onclick="setTab('company')">🏢 Companies</div>
   <div class="tab" id="tab-browse" onclick="setTab('browse')">🔤 Browse</div>
+  <div class="tab" id="tab-youtube" onclick="setTab('youtube')">▶️ YouTube</div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -756,6 +768,7 @@ function render() {
   if      (activeTab === 'search')  renderSearch();
   else if (activeTab === 'browse')  renderBrowse();
   else if (activeTab === 'company') renderCompany();
+  else if (activeTab === 'youtube') renderYouTube();
 }
 
 // Visible members: hide flagged rows unless admin+showHidden
@@ -1006,8 +1019,59 @@ function memberCard(m, highlightCompany) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ADMIN
+// YOUTUBE TAB
 // ═══════════════════════════════════════════════════════════════
+
+// Extract a readable channel handle from a YouTube URL
+// e.g. https://youtube.com/@CraftacularCreator → @CraftacularCreator
+//      https://youtube.com/channel/UCxxx       → (bare channel ID, show as-is)
+function ytChannelLabel(url) {
+  if (!url) return '';
+  try {
+    const path = new URL(url).pathname;
+    const m = path.match(/\/(@[^\/]+)/);
+    if (m) return m[1];
+    const m2 = path.match(/\/c\/([^\/]+)/i);
+    if (m2) return m2[1];
+    const m3 = path.match(/\/user\/([^\/]+)/i);
+    if (m3) return m3[1];
+  } catch(e) {}
+  return '';
+}
+
+function renderYouTube() {
+  const vis = visibleMembers();
+  const withYT = vis.filter(m => m.youtube);
+
+  let html = `<div class="yt-count">${withYT.length} member${withYT.length !== 1 ? 's' : ''} with YouTube channels</div>`;
+
+  if (!withYT.length) {
+    html += '<div class="empty-state">No YouTube channels found</div>';
+  } else {
+    for (const m of withYT) {
+      const channel = ytChannelLabel(m.youtube);
+      const subUrl = m.youtube.includes('?')
+        ? m.youtube + '&sub_confirmation=1'
+        : m.youtube + '?sub_confirmation=1';
+
+      html += `<div class="yt-card">`;
+      html += `<div class="yt-info">`;
+      if (m.ig) {
+        html += `<a class="yt-ig" href="https://instagram.com/${encodeURIComponent(m.ig)}" target="_blank" rel="noopener">@${escHtml(m.ig)}</a>`;
+      }
+      if (channel) {
+        html += `<div class="yt-channel">▶️ ${escHtml(channel)}</div>`;
+      }
+      html += `</div>`;
+      html += `<a class="yt-sub-btn" href="${escAttr(subUrl)}" target="_blank" rel="noopener">▶ Subscribe</a>`;
+      html += `</div>`;
+    }
+  }
+
+  setView(html);
+}
+
+
 function footerTap() {
   footerTaps++;
   clearTimeout(footerTimer);
