@@ -80,9 +80,8 @@ body{
 .aff-btn{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;text-decoration:none;background:#f3e8ff;color:#4B0082;border:1px solid #dcc6f0;-webkit-tap-highlight-color:transparent;}
 .aff-btn:hover{background:#e8d4f8;}
 .aff-btn.highlight{background:#4B0082;color:white;border-color:#4B0082;}
-.aff-pair{display:inline-flex;align-items:center;gap:4px;}
-.aff-code{font-size:10px;font-weight:600;color:#7b2fbe;background:#ede0ff;border:1px solid #dcc6f0;border-radius:20px;padding:3px 8px;white-space:nowrap;letter-spacing:0.3px;}
-.aff-code.highlight{color:white;background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.4);}
+.aff-code-inline{font-size:10px;font-weight:700;opacity:0.8;letter-spacing:0.3px;}
+.aff-code-inline.highlight{opacity:0.9;}
 
 /* ── BIO ── */
 .member-bio{font-size:11px;color:#666;line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid #f0e8f8;font-style:italic;}
@@ -257,7 +256,7 @@ body{
     🏢 <strong>Companies</strong> to find who has a link for a specific brand
   </div>
   <div class="intro-submit">
-    Not listed yet? <a href="https://docs.google.com/forms/d/e/1FAIpQLSfkM87liFOpQ8yoTRAKdRPAAbw-9UEq7bXn58QF35MPcdMD3Q/viewform?usp=header" target="_blank" id="submit-link">Submit your links here ↗</a>
+    Not listed yet? <a href="https://docs.google.com/forms/d/e/1FAIpQLSfkM87liFOpQ8yoTRAKdRPAAbw-9UEq7bXn58QF35MPcdMD3Q/viewform" target="_blank" id="submit-link">Submit your links here ↗</a>
   </div>
 </div>
 
@@ -267,8 +266,8 @@ body{
 <!-- TABS -->
 <div class="tabs">
   <div class="tab active" id="tab-search" onclick="setTab('search')">🔍 Search</div>
-  <div class="tab" id="tab-browse" onclick="setTab('browse')">🔤 Browse</div>
   <div class="tab" id="tab-company" onclick="setTab('company')">🏢 Companies</div>
+  <div class="tab" id="tab-browse" onclick="setTab('browse')">🔤 Browse</div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -334,7 +333,7 @@ const COL = {
 };
 
 // ── Admin password — change this! ──
-const ADMIN_PASSWORD = 'lance2026';
+const ADMIN_PASSWORD = 'crafty2025';
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
@@ -459,7 +458,14 @@ function cell(row, idx) {
 // Optionally include a discount code after the URL:
 //   "https://link.com | code: SAVE10"  or  "https://link.com (code: SAVE10)"
 function parseLinkField(company, raw) {
-  if (!raw || !raw.trim()) return null;
+  // Legacy fallback: if link field is empty but company field contains a URL,
+  // the entry was submitted in the old combined "Company: URL" format
+  if ((!raw || !raw.trim()) || !/https?:\/\//i.test(raw)) {
+    if (company && /https?:\/\//i.test(company)) {
+      return parseAffLink(company);
+    }
+    return null;
+  }
   raw = raw.replace(/\r/g, '').trim();
   const urlM = raw.match(/https?:\/\/[^\s]+/);
   if (!urlM) return null;
@@ -969,12 +975,11 @@ function memberCard(m, highlightCompany) {
     html += '<div class="aff-row">';
     for (const aff of m.affLinks) {
       const hl = highlightCompany && aff.label === highlightCompany;
-      html += `<span class="aff-pair">`;
-      html += `<a class="aff-btn${hl ? ' highlight' : ''}" href="${escAttr(aff.url)}" target="_blank" rel="noopener">${escHtml(aff.label)} ↗</a>`;
-      if (aff.code) {
-        html += `<span class="aff-code${hl ? ' highlight' : ''}">CODE: ${escHtml(aff.code)}</span>`;
-      }
-      html += `</span>`;
+      // Code badge sits INSIDE the button so it's unambiguously attached to its company
+      const codeBadge = aff.code
+        ? `<span class="aff-code-inline${hl ? ' highlight' : ''}"> · CODE: ${escHtml(aff.code)}</span>`
+        : '';
+      html += `<a class="aff-btn${hl ? ' highlight' : ''}" href="${escAttr(aff.url)}" target="_blank" rel="noopener">${escHtml(aff.label)} ↗${codeBadge}</a>`;
     }
     html += '</div></div>';
   }
