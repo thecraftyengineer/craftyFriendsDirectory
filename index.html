@@ -458,21 +458,33 @@ function cell(row, idx) {
 // Optionally include a discount code after the URL:
 //   "https://link.com | code: SAVE10"  or  "https://link.com (code: SAVE10)"
 function parseLinkField(company, raw) {
-  // Legacy fallback: if link field is empty but company field contains a URL,
-  // the entry was submitted in the old combined "Company: URL" format
-  if ((!raw || !raw.trim()) || !/https?:\/\//i.test(raw)) {
-    if (company && /https?:\/\//i.test(company)) {
-      return parseAffLink(company);
-    }
+  if (!raw || !raw.trim()) {
+    // No link field — check for legacy combined "Company: URL" in company field
+    if (company && /https?:\/\//i.test(company)) return parseAffLink(company);
     return null;
   }
-  raw = raw.replace(/\r/g, '').trim();
-  const urlM = raw.match(/https?:\/\/[^\s]+/);
+
+  let normalized = raw.replace(/\r/g, '').trim();
+
+  // If no protocol present, try to handle it
+  if (!/https?:\/\//i.test(normalized)) {
+    // Legacy fallback: company field has a full URL
+    if (company && /https?:\/\//i.test(company)) return parseAffLink(company);
+    // Bare domain (e.g. "acolorfullifedesigns.com CODE: amritafan10")
+    // Detect by looking for domain-like pattern at the start
+    if (/^[a-z0-9][a-z0-9\-\.]*\.[a-z]{2,}/i.test(normalized)) {
+      normalized = 'https://' + normalized;
+    } else {
+      return null;
+    }
+  }
+
+  const urlM = normalized.match(/https?:\/\/[^\s]+/);
   if (!urlM) return null;
   const url = urlM[0].replace(/[.,;)]+$/, '');
   const label = normalizeCompanyLabel(company || domainLabel(url));
   let code = '';
-  const afterUrl = raw.slice(urlM.index + urlM[0].length);
+  const afterUrl = normalized.slice(urlM.index + urlM[0].length);
   const codeM = afterUrl.match(/[|\(\s]*(?:code|discount|coupon)\s*:\s*([^\s\)|,]+)/i);
   if (codeM) code = codeM[1].trim();
   return { label, url, code };
