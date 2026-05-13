@@ -109,6 +109,15 @@ body{
 .yt-sub-btn:hover{background:#cc0000;}
 .yt-count{font-size:11px;color:#9d6bbf;margin-bottom:8px;padding:0 2px;}
 
+/* ── INSTAGRAM TAB ── */
+.ig-card{background:rgba(255,255,255,0.93);border:1.5px solid #e0d0f0;border-radius:14px;padding:11px 14px;margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.ig-card-info{flex:1;min-width:0;}
+.ig-card-name{font-size:13px;font-weight:600;color:#2d0050;margin-bottom:2px;}
+.ig-card-handle{font-size:12px;color:#4B0082;font-weight:500;}
+.ig-follow-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:white;border:none;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;text-decoration:none;-webkit-tap-highlight-color:transparent;}
+.ig-follow-btn:hover{opacity:0.9;}
+.ig-count{font-size:11px;color:#9d6bbf;margin-bottom:8px;padding:0 2px;}
+
 /* ── RESULT COUNT ── */
 .result-count{font-size:11px;color:#9d6bbf;margin-bottom:8px;padding:0 2px;}
 
@@ -280,6 +289,7 @@ body{
   <div class="tab" id="tab-company" onclick="setTab('company')">🏢 Companies</div>
   <div class="tab" id="tab-browse" onclick="setTab('browse')">🔤 Browse</div>
   <div class="tab" id="tab-youtube" onclick="setTab('youtube')">▶️ YouTube</div>
+  <div class="tab" id="tab-instagram" onclick="setTab('instagram')">📸 Instagram</div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -693,7 +703,7 @@ function processData(csvText) {
   }
 
   // Sort alphabetically by name
-  allMembers.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  allMembers.sort((a, b) => a.ig.localeCompare(b.ig, undefined, { sensitivity: 'base' }));
 
   renderSummary();
   render();
@@ -769,6 +779,7 @@ function render() {
   else if (activeTab === 'browse')  renderBrowse();
   else if (activeTab === 'company') renderCompany();
   else if (activeTab === 'youtube') renderYouTube();
+  else if (activeTab === 'instagram') renderInstagram();
 }
 
 // Visible members: hide flagged rows unless admin+showHidden
@@ -831,7 +842,7 @@ function clearSearch() {
 // ═══════════════════════════════════════════════════════════════
 function renderBrowse() {
   const vis = visibleMembers();
-  const hasLetter = new Set(vis.map(m => m.name.charAt(0).toUpperCase()).filter(Boolean));
+  const hasLetter = new Set(vis.map(m => m.ig.charAt(0).toUpperCase()).filter(Boolean));
 
   // A-Z bar
   let html = '<div class="az-bar">';
@@ -847,7 +858,7 @@ function renderBrowse() {
   html += '</div>';
 
   const shown = activeLetter
-    ? vis.filter(m => m.name.charAt(0).toUpperCase() === activeLetter)
+    ? vis.filter(m => m.ig.charAt(0).toUpperCase() === activeLetter)
     : vis;
 
   if (activeLetter) html += `<div class="result-count">${shown.length} member${shown.length !== 1 ? 's' : ''} — ${activeLetter}</div>`;
@@ -1064,6 +1075,32 @@ function renderYouTube() {
       }
       html += `</div>`;
       html += `<a class="yt-sub-btn" href="${escAttr(subUrl)}" target="_blank" rel="noopener">▶ Subscribe</a>`;
+      html += `</div>`;
+    }
+  }
+
+  setView(html);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INSTAGRAM TAB
+// ═══════════════════════════════════════════════════════════════
+function renderInstagram() {
+  const vis = visibleMembers();
+  const withIG = vis.filter(m => m.ig);
+
+  let html = `<div class="ig-count">${withIG.length} member${withIG.length !== 1 ? 's' : ''} to follow</div>`;
+
+  if (!withIG.length) {
+    html += '<div class="empty-state">No Instagram handles found</div>';
+  } else {
+    for (const m of withIG) {
+      html += `<div class="ig-card">`;
+      html += `<div class="ig-card-info">`;
+      html += `<div class="ig-card-name">${escHtml(m.name)}</div>`;
+      html += `<div class="ig-card-handle">@${escHtml(m.ig)}</div>`;
+      html += `</div>`;
+      html += `<a class="ig-follow-btn" href="https://instagram.com/${encodeURIComponent(m.ig)}" target="_blank" rel="noopener">📸 Follow</a>`;
       html += `</div>`;
     }
   }
